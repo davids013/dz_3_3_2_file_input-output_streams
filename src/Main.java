@@ -20,6 +20,7 @@ public class Main {
 
         String[] savesPaths = new String[gps.length];
         StringBuilder sb = new StringBuilder();
+        sb.append("\r\n");
         for (int i = 0; i < gps.length; i++) {
             String filePath = savePath + SEP + "save" + i + ".dat";
             savesPaths[i] = filePath;
@@ -76,15 +77,16 @@ public class Main {
             }
         }
         if (pathZip.exists()) {
-            try (FileInputStream fis = new FileInputStream(path);
-            ZipOutputStream zos = new ZipOutputStream(
+            try (ZipOutputStream zos = new ZipOutputStream(
                     new FileOutputStream(path))) {
                 for (String filePath : files) {
+                    FileInputStream fis = new FileInputStream(filePath);
                     File file = new File(filePath);
                     ZipEntry entry = new ZipEntry(file.getName());
                     zos.putNextEntry(entry);
                     byte[] buffer = new byte[fis.available()];
                     fis.read(buffer);
+                    fis.close();
                     zos.write(buffer);
                     zos.closeEntry();
                     ldt = LocalDateTime.now();
