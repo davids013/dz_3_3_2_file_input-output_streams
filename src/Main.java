@@ -18,14 +18,18 @@ public class Main {
         GameProgress gp3 = new GameProgress(30, 9, 32, 78.9);
         GameProgress[] gps = {gp1, gp2, gp3};
 
-        String[] savesPaths = new String[gps.length];
         StringBuilder sb = new StringBuilder();
         sb.append("\r\n");
         for (int i = 0; i < gps.length; i++) {
             String filePath = savePath + SEP + "save" + i + ".dat";
-            savesPaths[i] = filePath;
             sb.append(saveGame(filePath, gps[i])).append("\r\n");
         }
+        String[] savesPaths = new File(savePath).list();
+        for (int i = 0; i < savesPaths.length; i++) {
+            savesPaths[i] = savePath + SEP + savesPaths[i];
+        }
+        for (String item : savesPaths) System.out.println("---> " + item);
+
         sb.append(zipFiles(savePath + SEP + "zipped.zip", savesPaths));
         sb.append(deleteFiles(savesPaths));
         log(sb.toString(), logPath);
@@ -80,23 +84,27 @@ public class Main {
             try (ZipOutputStream zos = new ZipOutputStream(
                     new FileOutputStream(path))) {
                 for (String filePath : files) {
-                    FileInputStream fis = new FileInputStream(filePath);
-                    File file = new File(filePath);
-                    ZipEntry entry = new ZipEntry(file.getName());
-                    zos.putNextEntry(entry);
-                    byte[] buffer = new byte[fis.available()];
-                    fis.read(buffer);
-                    fis.close();
-                    zos.write(buffer);
-                    zos.closeEntry();
-                    ldt = LocalDateTime.now();
-                    temp = "Файл " + file.getName() + " заархивирован";
-                    System.out.println(temp);
-                    sb
-                            .append(ldt)
-                            .append("\t")
-                            .append(temp)
-                            .append("\r\n");
+                    if (filePath.contains(".dat")) {
+                        //filePath = new File(path).getParent() + SEP + filePath;
+                        FileInputStream fis = new FileInputStream(filePath);
+                        File file = new File(filePath);
+                        ZipEntry entry = new ZipEntry(file.getName());
+                        zos.putNextEntry(entry);
+                        byte[] buffer = new byte[fis.available()];
+                        fis.read(buffer);
+                        fis.close();
+                        zos.write(buffer);
+                        zos.closeEntry();
+                        ldt = LocalDateTime.now();
+                        temp = "Файл " + file.getName() + " заархивирован";
+                        System.out.println(temp);
+                        sb
+                                .append(ldt)
+                                .append("\t")
+                                .append(temp)
+                                .append("\r\n");
+                    }
+
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -118,31 +126,34 @@ public class Main {
         String temp;
         LocalDateTime ldt;
         for (String path : paths) {
-            File file = new File(path);
-            if (file.exists()) {
-                if (file.delete()) {
-                    temp = "Файл " + file.getName() + " удалён";
+            if (path.contains(".dat")) {
+                File file = new File(path);
+                if (file.exists()) {
+                    if (file.delete()) {
+                        temp = "Файл " + file.getName() + " удалён";
+                    } else {
+                        temp = "Файл " + file.getName() + " не удалось удалить";
+                    }
+                    ldt = LocalDateTime.now();
+                    System.out.println(temp);
+                    sb
+                            .append(ldt)
+                            .append("\t")
+                            .append(temp)
+                            .append("\r\n");
                 } else {
-                    temp = "Файл " + file.getName() + " не удалось удалить";
-                }
-                ldt = LocalDateTime.now();
-                System.out.println(temp);
-                sb
-                        .append(ldt)
-                        .append("\t")
-                        .append(temp)
-                        .append("\r\n");
-            } else {
-                ldt = LocalDateTime.now();
-                temp = "Файл " + file.getName() + " не найден";
-                System.out.println(temp);
+                    ldt = LocalDateTime.now();
+                    temp = "Файл " + file.getName() + " не найден";
+                    System.out.println(temp);
 
-                sb
-                        .append(ldt)
-                        .append("\t")
-                        .append(temp)
-                        .append("\r\n");
+                    sb
+                            .append(ldt)
+                            .append("\t")
+                            .append(temp)
+                            .append("\r\n");
+                }
             }
+
         }
         return sb.toString();
     }
