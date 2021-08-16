@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Домашнее задание к занятию 1.3\n" +
                 "Потоки ввода-вывода. Работа с файлами. Сериализация\n" +
-                "Задача 2: Сохранение");
+                "Задача 2: Сохранение\n");
 
         String savePath = "T:" + SEP + "Program Files" + SEP + "Games" + SEP + "savegames";
         String logPath = "T:" + SEP + "Program Files" + SEP + "Games" + SEP + "temp" + SEP + "temp.txt";
